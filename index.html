@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            height: 100%;
+            width: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            background-color: #000;
+        }
+        .slide {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .map-btn {
+            position: absolute;
+            bottom: 12%;
+            z-index: 10;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .map-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1 -->
+    <div class="slide">
+        <video src="slide1.mp4" autoplay muted playsinline></video>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide">
+        <video src="slide2.mp4" muted playsinline></video>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+        <video src="slide3.mp4" muted playsinline></video>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+        <video src="slide4.mp4" muted playsinline></video>
+    </div>
+
+    <!-- Slide 5 (Ada Tombol Google Maps) -->
+    <div class="slide">
+        <video src="slide5.mp4" muted playsinline></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn">Google Maps</a>
+    </div>
+
+    <!-- Slide 6 (Ada Tombol Google Maps) -->
+    <div class="slide">
+        <video src="slide6.mp4" muted playsinline></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn">Google Maps</a>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+        <video src="slide7.mp4" muted playsinline></video>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+        <video src="slide8.mp4" muted playsinline></video>
+    </div>
+
+    <script>
+        const videos = document.querySelectorAll('video');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const vid = entry.target;
+                if (entry.isIntersecting) {
+                    vid.currentTime = 0;
+                    vid.play().catch(() => {});
+                } else {
+                    vid.pause();
+                }
+            });
+        }, { threshold: 0.6 });
+
+        videos.forEach(video => {
+            observer.observe(video);
+        });
+    </script>
+</body>
+</html>
