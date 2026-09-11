@@ -13,19 +13,20 @@
         body, html {
             height: 100%;
             width: 100%;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
             background-color: #000;
         }
-        .slide {
+        /* Menggunakan tinggi total 8 slide agar halaman bisa di-scroll secara halus per milimeter */
+        .scroll-container {
+            height: 800vh;
+            position: relative;
+        }
+        .sticky-container {
+            position: sticky;
+            top: 0;
             height: 100vh;
             width: 100vw;
-            scroll-snap-align: start;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
+            background-color: #000;
         }
         video {
             position: absolute;
@@ -34,90 +35,124 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: none;
         }
-        .map-btn {
+        video.active {
+            display: block;
+        }
+        .map-link-area {
             position: absolute;
-            bottom: 12%;
+            bottom: 12%; 
+            width: 60%;  
+            height: 55px; 
             z-index: 10;
-            background-color: #28a745;
-            color: white;
-            padding: 12px 28px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-family: sans-serif;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            cursor: pointer;
+            display: none;
         }
-        .map-btn:active {
-            transform: scale(0.95);
+        .map-link-area.active {
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <!-- Slide 1 -->
-    <div class="slide">
-        <video src="Slide1.mp4" autoplay muted playsinline></video>
+    <div class="scroll-container">
+        <div class="sticky-container">
+            <!-- Video Slide 1-8 -->
+            <video id="vid1" src="Slide1.mp4" muted playsinline preload="auto"></video>
+            <video id="vid2" src="Slide2.mp4" muted playsinline preload="auto"></video>
+            <video id="vid3" src="Slide3.mp4" muted playsinline preload="auto"></video>
+            <video id="vid4" src="Slide4.mp4" muted playsinline preload="auto"></video>
+            
+            <video id="vid5" src="Slide5.mp4" muted playsinline preload="auto"></video>
+            <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map5"></a>
+
+            <video id="vid6" src="Slide6.mp4" muted playsinline preload="auto"></video>
+            <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map6"></a>
+
+            <video id="vid7" src="Slide7.mp4" muted playsinline preload="auto"></video>
+            <video id="vid8" src="Slide8.mp4" muted playsinline preload="auto"></video>
+        </div>
     </div>
 
-    <!-- Slide 2 -->
-    <div class="slide">
-        <video src="Slide2.mp4" muted playsinline></video>
-    </div>
-
-    <!-- Slide 3 -->
-    <div class="slide">
-        <video src="Slide3.mp4" muted playsinline></video>
-    </div>
-
-    <!-- Slide 4 -->
-    <div class="slide">
-        <video src="Slide4.mp4" muted playsinline></video>
-    </div>
-
-    <!-- Slide 5 (Ada Tombol Google Maps) -->
-    <div class="slide">
-        <video src="Slide5.mp4" muted playsinline></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn">Google Maps</a>
-    </div>
-
-    <!-- Slide 6 (Ada Tombol Google Maps) -->
-    <div class="slide">
-        <video src="Slide6.mp4" muted playsinline></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn">Google Maps</a>
-    </div>
-
-    <!-- Slide 7 -->
-    <div class="slide">
-        <video src="Slide7.mp4" muted playsinline></video>
-    </div>
-
-    <!-- Slide 8 -->
-    <div class="slide">
-        <video src="Slide8.mp4" muted playsinline></video>
-    </div>
+    <!-- Audio Musik Latar -->
+    <audio id="bgMusic" src="music.mp3" loop></audio>
 
     <script>
-        const videos = document.querySelectorAll('video');
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const vid = entry.target;
-                if (entry.isIntersecting) {
-                    vid.currentTime = 0;
-                    vid.play().catch(() => {});
+        const videos = [
+            document.getElementById('vid1'),
+            document.getElementById('vid2'),
+            document.getElementById('vid3'),
+            document.getElementById('vid4'),
+            document.getElementById('vid5'),
+            document.getElementById('vid6'),
+            document.getElementById('vid7'),
+            document.getElementById('vid8')
+        ];
+
+        const maps = [
+            null, null, null, null,
+            document.getElementById('map5'),
+            document.getElementById('map6'),
+            null, null
+        ];
+
+        const bgMusic = document.getElementById('bgMusic');
+        let musicStarted = false;
+
+        function updateVideoOnScroll() {
+            const scrollTop = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollFraction = scrollTop / maxScroll;
+            
+            // Menentukan slide aktif (0 sampai 7) berdasarkan posisi scroll tangan
+            let currentIndex = Math.floor(scrollFraction * videos.length);
+            if (currentIndex >= videos.length) currentIndex = videos.length - 1;
+            if (currentIndex < 0) currentIndex = 0;
+
+            // Hitung progres di dalam slide tersebut (0.0 sampai 1.0)
+            const slideProgress = (scrollFraction * videos.length) - currentIndex;
+
+            videos.forEach((vid, index) => {
+                if (index === currentIndex) {
+                    vid.classList.add('active');
+                    // Menyesuaikan detik video persis mengikuti seberapa jauh scroll tangan
+                    if (vid.duration) {
+                        vid.currentTime = slideProgress * vid.duration;
+                    }
                 } else {
-                    vid.pause();
+                    vid.classList.remove('active');
                 }
             });
-        }, { threshold: 0.6 });
 
-        videos.forEach(video => {
-            observer.observe(video);
+            maps.forEach((map, index) => {
+                if (map) {
+                    if (index === currentIndex) {
+                        map.classList.add('active');
+                    } else {
+                        map.classList.remove('active');
+                    }
+                }
+            });
+
+            // Musik otomatis menyala saat ada gerakan scrolling pertama kali
+            if (!musicStarted && scrollTop > 5) {
+                bgMusic.play().then(() => {
+                    musicStarted = true;
+                }).catch(() => {});
+            }
+        }
+
+        window.addEventListener('scroll', updateVideoOnScroll);
+        window.addEventListener('load', updateVideoOnScroll);
+
+        // Musik otomatis berhenti/pause saat halaman ditutup atau ditinggal keluar web
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                bgMusic.pause();
+            } else if (musicStarted) {
+                bgMusic.play().catch(() => {});
+            }
         });
     </script>
 </body>
