@@ -150,6 +150,13 @@
         const slide1Video = document.getElementById('slide1Video');
         let musicStarted = false;
 
+        // Memaksa semua video melakukan pre-load data awal begitu halaman dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+            videos.forEach(vid => {
+                vid.load();
+            });
+        });
+
         function startExperience() {
             bgMusic.play().then(() => {
                 musicStarted = true;
@@ -165,20 +172,17 @@
             });
         }
 
-        // Menggunakan teknik agar video tidak "di-reset paksa" berulang-ulang yang memicu glitch hijau
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const vid = entry.target;
                 if (entry.isIntersecting) {
                     if (vid !== slide1Video || musicStarted) {
-                        // Hanya play jika belum berjalan, cegah reset currentTime=0 yang bikin decoder kaget
                         if (vid.paused) {
                             vid.play().catch(() => {});
                         }
                     }
                 } else {
                     vid.pause();
-                    // Kembalikan ke awal secara mulus saat benar-benar tak terlihat
                     vid.currentTime = 0;
                 }
             });
@@ -188,7 +192,6 @@
             observer.observe(video);
         });
 
-        // Musik otomatis berhenti saat keluar tab/minimize browser
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bgMusic.pause();
