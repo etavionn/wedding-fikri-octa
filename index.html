@@ -14,7 +14,8 @@
             height: 100%;
             width: 100%;
             overflow-y: scroll;
-            scroll-snap-type: y mandatory;
+            /* Menggunakan proximity agar transisi scroll terasa mengalir bertahap ala presentasi */
+            scroll-snap-type: y proximity;
             background-color: #000;
         }
         .slide {
@@ -40,9 +41,41 @@
             z-index: 10;
             cursor: pointer;
         }
+        /* Tombol interaksi awal untuk memancing musik agar mau nyala di HP */
+        #play-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: opacity 0.5s ease;
+        }
+        .play-box {
+            background: #28a745;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
+
+    <!-- Tombol layar sentuh pertama untuk memastikan musik menyala normal di semua HP -->
+    <div id="play-overlay" onclick="startExperience()">
+        <div class="play-box">Buka Undangan 🎵</div>
+    </div>
 
     <!-- Slide 1 -->
     <div class="slide">
@@ -64,13 +97,13 @@
         <video src="Slide4.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
 
-    <!-- Slide 5 (Ada Tombol Google Maps) -->
+    <!-- Slide 5 (Google Maps Aktif) -->
     <div class="slide">
         <video src="Slide5.mp4" autoplay muted loop playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
     </div>
 
-    <!-- Slide 6 (Ada Tombol Google Maps) -->
+    <!-- Slide 6 (Google Maps Aktif) -->
     <div class="slide">
         <video src="Slide6.mp4" autoplay muted loop playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
@@ -91,22 +124,25 @@
 
     <script>
         const bgMusic = document.getElementById('bgMusic');
-        let musicStarted = false;
+        const overlay = document.getElementById('play-overlay');
 
-        // Musik menyala otomatis saat ada interaksi scroll pertama kali di layar
-        window.addEventListener('scroll', () => {
-            if (!musicStarted && window.scrollY > 10) {
-                bgMusic.play().then(() => {
-                    musicStarted = true;
-                }).catch(() => {});
-            }
-        }, { once: true });
+        function startExperience() {
+            bgMusic.play().then(() => {
+                // Hilangkan kotak overlay setelah diklik agar tamu bisa langsung scroll
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+            }).catch(err => {
+                console.log("Gagal memutar musik:", err);
+            });
+        }
 
         // Musik berhenti otomatis saat keluar web atau pindah tab
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bgMusic.pause();
-            } else if (musicStarted) {
+            } else if (overlay.style.display === 'none') {
                 bgMusic.play().catch(() => {});
             }
         });
