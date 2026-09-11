@@ -14,7 +14,6 @@
             height: 100%;
             width: 100%;
             overflow-y: scroll;
-            /* Dikembalikan ke mandatory agar rapi pas satu layar penuh per slide */
             scroll-snap-type: y mandatory;
             background-color: #000;
         }
@@ -23,7 +22,6 @@
             width: 100vw;
             scroll-snap-align: start;
             position: relative;
-            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -36,31 +34,39 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
         }
-        /* Area klik Google Maps khusus Slide 5 dan Slide 6 */
-        .map-link-area {
+        .map-btn {
             position: absolute;
             bottom: 12%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;  
-            height: 55px; 
             z-index: 10;
-            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        /* Tombol pembuka awal untuk mengaktifkan musik di HP */
+        .map-btn:active {
+            transform: scale(0.95);
+        }
+        /* Tombol Overlay Pembuka untuk Musik */
         #play-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 99999;
             color: white;
             font-family: sans-serif;
             text-align: center;
@@ -80,62 +86,65 @@
 </head>
 <body>
 
-    <!-- Tombol layar sentuh pertama untuk musik -->
+    <!-- Tombol Layar Sentuh Pembuka untuk Memastikan Musik Menyala -->
     <div id="play-overlay" onclick="startExperience()">
         <div class="play-box">Buka Undangan 🎵</div>
     </div>
 
     <!-- Slide 1 -->
     <div class="slide">
-        <video src="Slide1.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <video src="Slide1.mp4" autoplay muted playsinline></video>
     </div>
 
     <!-- Slide 2 -->
     <div class="slide">
-        <video src="Slide2.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <video src="Slide2.mp4" muted playsinline></video>
     </div>
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <video src="Slide3.mp4" muted playsinline></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <video src="Slide4.mp4" muted playsinline></video>
     </div>
 
-    <!-- Slide 5 (Google Maps) -->
+    <!-- Slide 5 (Tombol Google Maps) -->
     <div class="slide">
-        <video src="Slide5.mp4" autoplay muted loop playsinline preload="auto"></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
+        <video src="Slide5.mp4" muted playsinline></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn">Google Maps</a>
     </div>
 
-    <!-- Slide 6 (Google Maps yang tadinya tidak bisa diklik sudah diperbaiki) -->
+    <!-- Slide 6 (Tombol Google Maps dengan z-index tinggi agar bisa diklik sempurna) -->
     <div class="slide">
-        <video src="Slide6.mp4" autoplay muted loop playsinline preload="auto"></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
+        <video src="Slide6.mp4" muted playsinline></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn" style="z-index: 9999;">Google Maps</a>
     </div>
 
     <!-- Slide 7 -->
     <div class="slide">
-        <video src="Slide7.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <video src="Slide7.mp4" muted playsinline></video>
     </div>
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <video src="Slide8.mp4" muted playsinline></video>
     </div>
 
     <!-- Audio Musik Latar -->
     <audio id="bgMusic" src="music.mp3" loop></audio>
 
     <script>
+        const videos = document.querySelectorAll('video');
         const bgMusic = document.getElementById('bgMusic');
         const overlay = document.getElementById('play-overlay');
+        let musicStarted = false;
 
         function startExperience() {
             bgMusic.play().then(() => {
+                musicStarted = true;
                 overlay.style.opacity = '0';
                 setTimeout(() => {
                     overlay.style.display = 'none';
@@ -145,11 +154,27 @@
             });
         }
 
-        // Musik berhenti otomatis saat keluar web atau pindah tab
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const vid = entry.target;
+                if (entry.isIntersecting) {
+                    vid.currentTime = 0;
+                    vid.play().catch(() => {});
+                } else {
+                    vid.pause();
+                }
+            });
+        }, { threshold: 0.6 });
+
+        videos.forEach(video => {
+            observer.observe(video);
+        });
+
+        // Musik otomatis berhenti saat keluar tab/minimize browser
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bgMusic.pause();
-            } else if (overlay.style.display === 'none') {
+            } else if (musicStarted && overlay.style.display === 'none') {
                 bgMusic.play().catch(() => {});
             }
         });
