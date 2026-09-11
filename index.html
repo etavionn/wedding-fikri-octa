@@ -35,21 +35,31 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            background-color: #000; /* Mencegah kedipan green screen/blank */
+            background-color: #000;
         }
         
-        /* Area klik transparan yang pas di atas tulisan Google Maps desain Canva (Slide 5 & 6) */
-        .map-link-area {
+        /* Area klik transparan untuk Slide 5 */
+        .map-link-area-5 {
             position: absolute;
-            /* Sesuaikan posisi 'bottom' atau 'top' jika letak tulisan Google Maps di Canva berbeda */
             bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 50%;   /* Lebar area tombol di video */
-            height: 50px; /* Tinggi area tombol di video */
+            width: 45%;  
+            height: 45px; 
             z-index: 9999;
             cursor: pointer;
-            /* background: rgba(0, 255, 0, 0.4); Buka komentar ini jika ingin tes lihat kotaknya pas atau tidak */
+        }
+
+        /* Area klik transparan untuk Slide 6 (Dinaikkan jauh lebih tinggi agar pas menutupi tombol Google Maps di gambar) */
+        .map-link-area-6 {
+            position: absolute;
+            bottom: 30%; /* Dinaikkan ke posisi sekitar 30% dari bawah agar persis menutupi tombol hijau Google Maps */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 45%;  
+            height: 45px; 
+            z-index: 9999;
+            cursor: pointer;
         }
 
         /* Tombol Overlay Pembuka untuk Musik */
@@ -100,24 +110,24 @@
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide3.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide4.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
-    <!-- Slide 5 (Area Klik Transparan tepat di tulisan Google Maps Canva) -->
+    <!-- Slide 5 (Area Klik Google Maps) -->
     <div class="slide">
         <video src="Slide5.mp4" muted playsinline preload="auto"></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-5"></a>
     </div>
 
-    <!-- Slide 6 (Area Klik Transparan tepat di tulisan Google Maps Canva) -->
+    <!-- Slide 6 (Area Klik Google Maps yang posisinya sudah dinaikkan pas ke tombol hijau gambar) -->
     <div class="slide">
         <video src="Slide6.mp4" muted playsinline preload="auto"></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-6"></a>
     </div>
 
     <!-- Slide 7 -->
@@ -127,7 +137,7 @@
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide8.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
     <!-- Audio Musik Latar -->
