@@ -50,10 +50,10 @@
             cursor: pointer;
         }
 
-        /* Area klik transparan untuk Slide 6 (Dinaikkan jauh lebih tinggi agar pas menutupi tombol Google Maps di gambar) */
+        /* Area klik transparan untuk Slide 6 */
         .map-link-area-6 {
             position: absolute;
-            bottom: 30%; /* Dinaikkan ke posisi sekitar 30% dari bawah agar persis menutupi tombol hijau Google Maps */
+            bottom: 30%; 
             left: 50%;
             transform: translateX(-50%);
             width: 45%;  
@@ -62,14 +62,14 @@
             cursor: pointer;
         }
 
-        /* Tombol Overlay Pembuka untuk Musik */
+        /* Tombol Overlay Pembuka */
         #play-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -93,14 +93,14 @@
 </head>
 <body>
 
-    <!-- Tombol Layar Sentuh Pembuka untuk Musik -->
+    <!-- Tombol Layar Sentuh Pembuka -->
     <div id="play-overlay" onclick="startExperience()">
         <div class="play-box">Buka Undangan 🎵</div>
     </div>
 
     <!-- Slide 1 -->
     <div class="slide">
-        <video src="Slide1.mp4" autoplay muted playsinline preload="auto"></video>
+        <video id="slide1Video" src="Slide1.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 2 -->
@@ -110,21 +110,21 @@
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" autoplay muted playsinline preload="auto"></video>
+        <video src="Slide3.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" autoplay muted playsinline preload="auto"></video>
+        <video src="Slide4.mp4" muted playsinline preload="auto"></video>
     </div>
 
-    <!-- Slide 5 (Area Klik Google Maps) -->
+    <!-- Slide 5 (Google Maps) -->
     <div class="slide">
         <video src="Slide5.mp4" muted playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-5"></a>
     </div>
 
-    <!-- Slide 6 (Area Klik Google Maps yang posisinya sudah dinaikkan pas ke tombol hijau gambar) -->
+    <!-- Slide 6 (Google Maps) -->
     <div class="slide">
         <video src="Slide6.mp4" muted playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-6"></a>
@@ -137,7 +137,7 @@
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" autoplay muted playsinline preload="auto"></video>
+        <video src="Slide8.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Audio Musik Latar -->
@@ -147,31 +147,42 @@
         const videos = document.querySelectorAll('video');
         const bgMusic = document.getElementById('bgMusic');
         const overlay = document.getElementById('play-overlay');
+        const slide1Video = document.getElementById('slide1Video');
         let musicStarted = false;
 
         function startExperience() {
             bgMusic.play().then(() => {
                 musicStarted = true;
+                slide1Video.currentTime = 0;
+                slide1Video.play().catch(() => {});
+                
                 overlay.style.opacity = '0';
                 setTimeout(() => {
                     overlay.style.display = 'none';
                 }, 500);
             }).catch(err => {
-                console.log("Gagal memutar musik:", err);
+                console.log("Gagal:", err);
             });
         }
 
+        // Menggunakan teknik agar video tidak "di-reset paksa" berulang-ulang yang memicu glitch hijau
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const vid = entry.target;
                 if (entry.isIntersecting) {
-                    vid.currentTime = 0;
-                    vid.play().catch(() => {});
+                    if (vid !== slide1Video || musicStarted) {
+                        // Hanya play jika belum berjalan, cegah reset currentTime=0 yang bikin decoder kaget
+                        if (vid.paused) {
+                            vid.play().catch(() => {});
+                        }
+                    }
                 } else {
                     vid.pause();
+                    // Kembalikan ke awal secara mulus saat benar-benar tak terlihat
+                    vid.currentTime = 0;
                 }
             });
-        }, { threshold: 0.5 });
+        }, { threshold: 0.6 });
 
         videos.forEach(video => {
             observer.observe(video);
