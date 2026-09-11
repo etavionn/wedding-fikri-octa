@@ -26,6 +26,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            background-color: #000;
         }
         video {
             position: absolute;
@@ -34,26 +35,16 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            background: #000;
         }
-        .map-btn {
+        /* Area klik transparan pas di atas kotak hijau desain Canva kamu (Slide 5 dan 6) */
+        .map-link-area {
             position: absolute;
-            bottom: 12%;
-            z-index: 10;
-            background-color: #28a745;
-            color: white;
-            padding: 12px 28px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-family: sans-serif;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .map-btn:active {
-            transform: scale(0.95);
+            bottom: 12%; 
+            width: 60%;  
+            height: 55px; 
+            z-index: 9999;
+            cursor: pointer;
         }
         /* Tombol Overlay Pembuka untuk Musik */
         #play-overlay {
@@ -86,51 +77,51 @@
 </head>
 <body>
 
-    <!-- Tombol Layar Sentuh Pembuka untuk Memastikan Musik Menyala -->
+    <!-- Tombol Layar Sentuh Pembuka untuk Musik -->
     <div id="play-overlay" onclick="startExperience()">
         <div class="play-box">Buka Undangan 🎵</div>
     </div>
 
     <!-- Slide 1 -->
     <div class="slide">
-        <video src="Slide1.mp4" autoplay muted playsinline></video>
+        <video src="Slide1.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 2 -->
     <div class="slide">
-        <video src="Slide2.mp4" muted playsinline></video>
+        <video src="Slide2.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" muted playsinline></video>
+        <video src="Slide3.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" muted playsinline></video>
+        <video src="Slide4.mp4" muted playsinline preload="auto"></video>
     </div>
 
-    <!-- Slide 5 (Tombol Google Maps) -->
+    <!-- Slide 5 (Area Klik Transparan Google Maps) -->
     <div class="slide">
-        <video src="Slide5.mp4" muted playsinline></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn">Google Maps</a>
+        <video src="Slide5.mp4" muted playsinline preload="auto"></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
     </div>
 
-    <!-- Slide 6 (Tombol Google Maps dengan z-index tinggi agar bisa diklik sempurna) -->
+    <!-- Slide 6 (Area Klik Transparan Google Maps) -->
     <div class="slide">
-        <video src="Slide6.mp4" muted playsinline></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-btn" style="z-index: 9999;">Google Maps</a>
+        <video src="Slide6.mp4" muted playsinline preload="auto"></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
     </div>
 
     <!-- Slide 7 -->
     <div class="slide">
-        <video src="Slide7.mp4" muted playsinline></video>
+        <video src="Slide7.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" muted playsinline></video>
+        <video src="Slide8.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Audio Musik Latar -->
