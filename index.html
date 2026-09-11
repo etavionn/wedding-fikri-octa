@@ -50,10 +50,10 @@
             cursor: pointer;
         }
 
-        /* Area klik transparan untuk Slide 6 */
+        /* Area klik transparan untuk Slide 6 (Dinaikkan jauh lebih tinggi agar pas menutupi tombol Google Maps di gambar) */
         .map-link-area-6 {
             position: absolute;
-            bottom: 30%; 
+            bottom: 30%; /* Dinaikkan ke posisi sekitar 30% dari bawah agar persis menutupi tombol hijau Google Maps */
             left: 50%;
             transform: translateX(-50%);
             width: 45%;  
@@ -62,14 +62,14 @@
             cursor: pointer;
         }
 
-        /* Tombol Overlay Pembuka */
+        /* Tombol Overlay Pembuka untuk Musik */
         #play-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -93,51 +93,51 @@
 </head>
 <body>
 
-    <!-- Tombol Layar Sentuh Pembuka -->
+    <!-- Tombol Layar Sentuh Pembuka untuk Musik -->
     <div id="play-overlay" onclick="startExperience()">
         <div class="play-box">Buka Undangan 🎵</div>
     </div>
 
     <!-- Slide 1 -->
     <div class="slide">
-        <video id="slide1Video" src="Slide1.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide1.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 2 -->
     <div class="slide">
-        <video src="Slide2.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide2.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide3.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide4.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
-    <!-- Slide 5 (Google Maps) -->
+    <!-- Slide 5 (Area Klik Google Maps) -->
     <div class="slide">
-        <video src="Slide5.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide5.mp4" muted playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-5"></a>
     </div>
 
-    <!-- Slide 6 (Google Maps) -->
+    <!-- Slide 6 (Area Klik Google Maps yang posisinya sudah dinaikkan pas ke tombol hijau gambar) -->
     <div class="slide">
-        <video src="Slide6.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide6.mp4" muted playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-6"></a>
     </div>
 
     <!-- Slide 7 -->
     <div class="slide">
-        <video src="Slide7.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide7.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" muted playsinline preload="metadata"></video>
+        <video src="Slide8.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
     <!-- Audio Musik Latar -->
@@ -147,43 +147,37 @@
         const videos = document.querySelectorAll('video');
         const bgMusic = document.getElementById('bgMusic');
         const overlay = document.getElementById('play-overlay');
-        const slide1Video = document.getElementById('slide1Video');
         let musicStarted = false;
 
         function startExperience() {
             bgMusic.play().then(() => {
                 musicStarted = true;
-                slide1Video.currentTime = 0;
-                slide1Video.play().catch(() => {});
-                
                 overlay.style.opacity = '0';
                 setTimeout(() => {
                     overlay.style.display = 'none';
                 }, 500);
             }).catch(err => {
-                console.log("Gagal:", err);
+                console.log("Gagal memutar musik:", err);
             });
         }
 
-        // Mengembalikan IntersectionObserver standar yang paling ringan untuk performa HP
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const vid = entry.target;
                 if (entry.isIntersecting) {
-                    if (vid !== slide1Video || musicStarted) {
-                        vid.currentTime = 0;
-                        vid.play().catch(() => {});
-                    }
+                    vid.currentTime = 0;
+                    vid.play().catch(() => {});
                 } else {
                     vid.pause();
                 }
             });
-        }, { threshold: 0.6 });
+        }, { threshold: 0.5 });
 
         videos.forEach(video => {
             observer.observe(video);
         });
 
+        // Musik otomatis berhenti saat keluar tab/minimize browser
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bgMusic.pause();
