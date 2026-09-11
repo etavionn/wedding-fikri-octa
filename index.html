@@ -36,12 +36,6 @@
             height: 100%;
             object-fit: cover;
             background-color: #000;
-            /* Menyembunyikan video sampai frame pertamanya benar-benar siap */
-            opacity: 0;
-            transition: opacity 0.2s ease-in;
-        }
-        video.ready {
-            opacity: 1;
         }
         
         /* Area klik transparan untuk Slide 5 */
@@ -68,7 +62,7 @@
             cursor: pointer;
         }
 
-        /* Tombol Overlay Pembuka untuk Musik */
+        /* Tombol Overlay Pembuka */
         #play-overlay {
             position: fixed;
             top: 0;
@@ -99,51 +93,51 @@
 </head>
 <body>
 
-    <!-- Tombol Layar Sentuh Pembuka untuk Musik -->
+    <!-- Tombol Layar Sentuh Pembuka untuk Musik & Animasi Cover -->
     <div id="play-overlay" onclick="startExperience()">
         <div class="play-box">Buka Undangan 🎵</div>
     </div>
 
-    <!-- Slide 1 -->
+    <!-- Slide 1 (Video dipause di awal, baru bergerak saat overlay diklik) -->
     <div class="slide">
-        <video src="Slide1.mp4" autoplay muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video id="slide1Video" src="Slide1.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 2 -->
     <div class="slide">
-        <video src="Slide2.mp4" muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video src="Slide2.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video src="Slide3.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video src="Slide4.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 5 (Area Klik Google Maps) -->
     <div class="slide">
-        <video src="Slide5.mp4" muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video src="Slide5.mp4" muted playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-5"></a>
     </div>
 
     <!-- Slide 6 (Area Klik Google Maps) -->
     <div class="slide">
-        <video src="Slide6.mp4" muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video src="Slide6.mp4" muted playsinline preload="auto"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-6"></a>
     </div>
 
     <!-- Slide 7 -->
     <div class="slide">
-        <video src="Slide7.mp4" muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video src="Slide7.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" muted playsinline preload="auto" onloadeddata="this.classList.add('ready')"></video>
+        <video src="Slide8.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Audio Musik Latar -->
@@ -153,17 +147,22 @@
         const videos = document.querySelectorAll('video');
         const bgMusic = document.getElementById('bgMusic');
         const overlay = document.getElementById('play-overlay');
+        const slide1Video = document.getElementById('slide1Video');
         let musicStarted = false;
 
         function startExperience() {
+            // Putar musik dan putar video slide 1 secara bersamaan saat tombol diklik
             bgMusic.play().then(() => {
                 musicStarted = true;
+                slide1Video.currentTime = 0;
+                slide1Video.play().catch(() => {});
+                
                 overlay.style.opacity = '0';
                 setTimeout(() => {
                     overlay.style.display = 'none';
                 }, 500);
             }).catch(err => {
-                console.log("Gagal memutar musik:", err);
+                console.log("Gagal memulai:", err);
             });
         }
 
@@ -171,8 +170,11 @@
             entries.forEach(entry => {
                 const vid = entry.target;
                 if (entry.isIntersecting) {
-                    vid.currentTime = 0;
-                    vid.play().catch(() => {});
+                    // Jangan restart slide 1 jika baru saja dibuka dari tombol
+                    if (vid !== slide1Video || musicStarted) {
+                        vid.currentTime = 0;
+                        vid.play().catch(() => {});
+                    }
                 } else {
                     vid.pause();
                 }
