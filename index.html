@@ -14,7 +14,6 @@
             height: 100%;
             width: 100%;
             overflow-y: scroll;
-            /* Menggunakan mandatory agar geseran sedikit langsung mengunci ke slide utuh */
             scroll-snap-type: y mandatory;
             background-color: #000;
         }
@@ -22,115 +21,86 @@
             height: 100vh;
             width: 100vw;
             scroll-snap-align: start;
-            /* proximity membantu transisi terasa lebih natural saat discroll */
-            scroll-snap-stop: always; 
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
             background-color: #000;
         }
         video {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
         .map-link-area {
             position: absolute;
-            bottom: 12%; 
+            bottom: 12%;
+            left: 50%;
+            transform: translateX(-50%);
             width: 60%;  
             height: 55px; 
             z-index: 10;
             cursor: pointer;
-            display: none;
-        }
-        .map-link-area.active {
-            display: block;
         }
     </style>
 </head>
 <body>
 
-    <!-- Slide 1 (Cover muncul normal dan rapi) -->
+    <!-- Slide 1 -->
     <div class="slide">
-        <video src="Slide1.mp4" autoplay muted playsinline preload="auto"></video>
+        <video src="Slide1.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 2 -->
     <div class="slide">
-        <video src="Slide2.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide2.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide3.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide4.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 5 (Ada Tombol Google Maps) -->
     <div class="slide">
-        <video src="Slide5.mp4" muted playsinline preload="auto"></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map5"></a>
+        <video src="Slide5.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
     </div>
 
     <!-- Slide 6 (Ada Tombol Google Maps) -->
     <div class="slide">
-        <video src="Slide6.mp4" muted playsinline preload="auto"></video>
-        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map6"></a>
+        <video src="Slide6.mp4" autoplay muted loop playsinline preload="auto"></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area"></a>
     </div>
 
     <!-- Slide 7 -->
     <div class="slide">
-        <video src="Slide7.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide7.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide8.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
 
     <!-- Audio Musik Latar -->
     <audio id="bgMusic" src="music.mp3" loop></audio>
 
     <script>
-        const slides = document.querySelectorAll('.slide');
         const bgMusic = document.getElementById('bgMusic');
         let musicStarted = false;
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const vid = entry.target.querySelector('video');
-                const mapBtn = entry.target.querySelector('.map-link-area');
-
-                if (entry.isIntersecting) {
-                    vid.currentTime = 0;
-                    vid.play().catch(() => {});
-                    if (mapBtn) mapBtn.classList.add('active');
-
-                    // Musik otomatis menyala saat mulai digulir
-                    if (!musicStarted) {
-                        bgMusic.play().then(() => {
-                            musicStarted = true;
-                        }).catch(() => {});
-                    }
-                } else {
-                    vid.pause();
-                    if (mapBtn) mapBtn.classList.remove('active');
-                }
-            });
-        }, { threshold: 0.4 }); // Bergeser otomatis begitu melewati sekitar 40% layar
-
-        slides.forEach(slide => {
-            observer.observe(slide);
-        });
+        // Musik menyala otomatis saat ada interaksi scroll pertama kali di layar
+        window.addEventListener('scroll', () => {
+            if (!musicStarted && window.scrollY > 10) {
+                bgMusic.play().then(() => {
+                    musicStarted = true;
+                }).catch(() => {});
+            }
+        }, { once: true });
 
         // Musik berhenti otomatis saat keluar web atau pindah tab
         document.addEventListener('visibilitychange', () => {
