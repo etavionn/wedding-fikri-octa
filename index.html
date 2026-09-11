@@ -100,44 +100,44 @@
 
     <!-- Slide 1 -->
     <div class="slide">
-        <video id="slide1Video" src="Slide1.mp4" muted playsinline preload="auto"></video>
+        <video id="slide1Video" src="Slide1.mp4" muted playsinline preload="metadata"></video>
     </div>
 
     <!-- Slide 2 -->
     <div class="slide">
-        <video src="Slide2.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide2.mp4" muted playsinline preload="metadata"></video>
     </div>
 
     <!-- Slide 3 -->
     <div class="slide">
-        <video src="Slide3.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide3.mp4" muted playsinline preload="metadata"></video>
     </div>
 
     <!-- Slide 4 -->
     <div class="slide">
-        <video src="Slide4.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide4.mp4" muted playsinline preload="metadata"></video>
     </div>
 
     <!-- Slide 5 (Google Maps) -->
     <div class="slide">
-        <video src="Slide5.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide5.mp4" muted playsinline preload="metadata"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-5"></a>
     </div>
 
     <!-- Slide 6 (Google Maps) -->
     <div class="slide">
-        <video src="Slide6.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide6.mp4" muted playsinline preload="metadata"></video>
         <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area-6"></a>
     </div>
 
     <!-- Slide 7 -->
     <div class="slide">
-        <video src="Slide7.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide7.mp4" muted playsinline preload="metadata"></video>
     </div>
 
     <!-- Slide 8 -->
     <div class="slide">
-        <video src="Slide8.mp4" muted playsinline preload="auto"></video>
+        <video src="Slide8.mp4" muted playsinline preload="metadata"></video>
     </div>
 
     <!-- Audio Musik Latar -->
@@ -149,13 +149,6 @@
         const overlay = document.getElementById('play-overlay');
         const slide1Video = document.getElementById('slide1Video');
         let musicStarted = false;
-
-        // Memaksa semua video melakukan pre-load data awal begitu halaman dibuka
-        window.addEventListener('DOMContentLoaded', () => {
-            videos.forEach(vid => {
-                vid.load();
-            });
-        });
 
         function startExperience() {
             bgMusic.play().then(() => {
@@ -172,18 +165,17 @@
             });
         }
 
+        // Mengembalikan IntersectionObserver standar yang paling ringan untuk performa HP
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const vid = entry.target;
                 if (entry.isIntersecting) {
                     if (vid !== slide1Video || musicStarted) {
-                        if (vid.paused) {
-                            vid.play().catch(() => {});
-                        }
+                        vid.currentTime = 0;
+                        vid.play().catch(() => {});
                     }
                 } else {
                     vid.pause();
-                    vid.currentTime = 0;
                 }
             });
         }, { threshold: 0.6 });
