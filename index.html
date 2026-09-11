@@ -13,18 +13,21 @@
         body, html {
             height: 100%;
             width: 100%;
+            overflow-y: scroll;
+            /* Menggunakan mandatory agar geseran sedikit langsung mengunci ke slide utuh */
+            scroll-snap-type: y mandatory;
             background-color: #000;
         }
-        /* Menggunakan tinggi total 8 slide agar halaman bisa di-scroll secara halus per milimeter */
-        .scroll-container {
-            height: 800vh;
-            position: relative;
-        }
-        .sticky-container {
-            position: sticky;
-            top: 0;
+        .slide {
             height: 100vh;
             width: 100vw;
+            scroll-snap-align: start;
+            /* proximity membantu transisi terasa lebih natural saat discroll */
+            scroll-snap-stop: always; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
             background-color: #000;
         }
@@ -35,10 +38,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none;
-        }
-        video.active {
-            display: block;
         }
         .map-link-area {
             position: absolute;
@@ -56,97 +55,84 @@
 </head>
 <body>
 
-    <div class="scroll-container">
-        <div class="sticky-container">
-            <!-- Video Slide 1-8 -->
-            <video id="vid1" src="Slide1.mp4" muted playsinline preload="auto"></video>
-            <video id="vid2" src="Slide2.mp4" muted playsinline preload="auto"></video>
-            <video id="vid3" src="Slide3.mp4" muted playsinline preload="auto"></video>
-            <video id="vid4" src="Slide4.mp4" muted playsinline preload="auto"></video>
-            
-            <video id="vid5" src="Slide5.mp4" muted playsinline preload="auto"></video>
-            <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map5"></a>
+    <!-- Slide 1 (Cover muncul normal dan rapi) -->
+    <div class="slide">
+        <video src="Slide1.mp4" autoplay muted playsinline preload="auto"></video>
+    </div>
 
-            <video id="vid6" src="Slide6.mp4" muted playsinline preload="auto"></video>
-            <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map6"></a>
+    <!-- Slide 2 -->
+    <div class="slide">
+        <video src="Slide2.mp4" muted playsinline preload="auto"></video>
+    </div>
 
-            <video id="vid7" src="Slide7.mp4" muted playsinline preload="auto"></video>
-            <video id="vid8" src="Slide8.mp4" muted playsinline preload="auto"></video>
-        </div>
+    <!-- Slide 3 -->
+    <div class="slide">
+        <video src="Slide3.mp4" muted playsinline preload="auto"></video>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+        <video src="Slide4.mp4" muted playsinline preload="auto"></video>
+    </div>
+
+    <!-- Slide 5 (Ada Tombol Google Maps) -->
+    <div class="slide">
+        <video src="Slide5.mp4" muted playsinline preload="auto"></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map5"></a>
+    </div>
+
+    <!-- Slide 6 (Ada Tombol Google Maps) -->
+    <div class="slide">
+        <video src="Slide6.mp4" muted playsinline preload="auto"></video>
+        <a href="https://maps.app.goo.gl/bvZLtwJx3cSZKvf46" target="_blank" class="map-link-area" id="map6"></a>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+        <video src="Slide7.mp4" muted playsinline preload="auto"></video>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+        <video src="Slide8.mp4" muted playsinline preload="auto"></video>
     </div>
 
     <!-- Audio Musik Latar -->
     <audio id="bgMusic" src="music.mp3" loop></audio>
 
     <script>
-        const videos = [
-            document.getElementById('vid1'),
-            document.getElementById('vid2'),
-            document.getElementById('vid3'),
-            document.getElementById('vid4'),
-            document.getElementById('vid5'),
-            document.getElementById('vid6'),
-            document.getElementById('vid7'),
-            document.getElementById('vid8')
-        ];
-
-        const maps = [
-            null, null, null, null,
-            document.getElementById('map5'),
-            document.getElementById('map6'),
-            null, null
-        ];
-
+        const slides = document.querySelectorAll('.slide');
         const bgMusic = document.getElementById('bgMusic');
         let musicStarted = false;
 
-        function updateVideoOnScroll() {
-            const scrollTop = window.scrollY;
-            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollFraction = scrollTop / maxScroll;
-            
-            // Menentukan slide aktif (0 sampai 7) berdasarkan posisi scroll tangan
-            let currentIndex = Math.floor(scrollFraction * videos.length);
-            if (currentIndex >= videos.length) currentIndex = videos.length - 1;
-            if (currentIndex < 0) currentIndex = 0;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const vid = entry.target.querySelector('video');
+                const mapBtn = entry.target.querySelector('.map-link-area');
 
-            // Hitung progres di dalam slide tersebut (0.0 sampai 1.0)
-            const slideProgress = (scrollFraction * videos.length) - currentIndex;
+                if (entry.isIntersecting) {
+                    vid.currentTime = 0;
+                    vid.play().catch(() => {});
+                    if (mapBtn) mapBtn.classList.add('active');
 
-            videos.forEach((vid, index) => {
-                if (index === currentIndex) {
-                    vid.classList.add('active');
-                    // Menyesuaikan detik video persis mengikuti seberapa jauh scroll tangan
-                    if (vid.duration) {
-                        vid.currentTime = slideProgress * vid.duration;
+                    // Musik otomatis menyala saat mulai digulir
+                    if (!musicStarted) {
+                        bgMusic.play().then(() => {
+                            musicStarted = true;
+                        }).catch(() => {});
                     }
                 } else {
-                    vid.classList.remove('active');
+                    vid.pause();
+                    if (mapBtn) mapBtn.classList.remove('active');
                 }
             });
+        }, { threshold: 0.4 }); // Bergeser otomatis begitu melewati sekitar 40% layar
 
-            maps.forEach((map, index) => {
-                if (map) {
-                    if (index === currentIndex) {
-                        map.classList.add('active');
-                    } else {
-                        map.classList.remove('active');
-                    }
-                }
-            });
+        slides.forEach(slide => {
+            observer.observe(slide);
+        });
 
-            // Musik otomatis menyala saat ada gerakan scrolling pertama kali
-            if (!musicStarted && scrollTop > 5) {
-                bgMusic.play().then(() => {
-                    musicStarted = true;
-                }).catch(() => {});
-            }
-        }
-
-        window.addEventListener('scroll', updateVideoOnScroll);
-        window.addEventListener('load', updateVideoOnScroll);
-
-        // Musik otomatis berhenti/pause saat halaman ditutup atau ditinggal keluar web
+        // Musik berhenti otomatis saat keluar web atau pindah tab
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bgMusic.pause();
